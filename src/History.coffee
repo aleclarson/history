@@ -1,4 +1,5 @@
 
+isDev = require "isDev"
 Event = require "eve"
 Type = require "Type"
 
@@ -21,7 +22,7 @@ type.definePrototype
       unless path.startsWith "/"
         path = "/" + path
 
-      if path is @_path
+      if isDev and path is @_path
         throw Error "Cannot set 'path' to its current value!"
 
       @_path = path
@@ -44,7 +45,7 @@ type.defineMethods
     unless path.startsWith "/"
       path = "/" + path
 
-    if path is @_path
+    if isDev and path is @_path
       throw Error "Cannot call 'push' with the current path!"
 
     @_path = path

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "Type": "aleclarson/Type#2.3.1",
-    "eve": "aleclarson/eve#1.1.1"
+    "eve": "aleclarson/eve#1.1.1",
+    "isDev": "aleclarson/isDev#2.0.0"
   }
 }
