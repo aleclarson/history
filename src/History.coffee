@@ -12,14 +12,6 @@ type.defineValues ->
 
   didPop: Event()
 
-  _path: location.pathname
-
-  _length: @_loadLength()
-
-type.initInstance ->
-  window.addEventListener "popstate", @_stateChanged.bind this
-  return
-
 type.definePrototype
 
   path:
@@ -66,6 +58,22 @@ type.defineMethods
     if @_length > 0
       history.back()
     return
+
+#
+# Internal
+#
+
+type.defineValues ->
+
+  _path: location.pathname
+
+  _length: @_loadLength()
+
+type.initInstance ->
+  window.addEventListener "popstate", @_stateChanged.bind this
+  return
+
+type.defineMethods
 
   _loadLength: ->
     if length = sessionStorage.getItem "history.length"
