@@ -25,9 +25,12 @@ type.definePrototype
       if isDev and path is @_path
         throw Error "Cannot set 'path' to its current value!"
 
-      @_path = path
+      @_setPath path
       history.replaceState {id: @_length}, null, path
       return
+
+  parts:
+    get: -> @_parts
 
   length:
     get: -> @_length
@@ -48,7 +51,7 @@ type.defineMethods
     if isDev and path is @_path
       throw Error "Cannot call 'push' with the current path!"
 
-    @_path = path
+    @_setPath path
     @_updateLength length = @_length + 1
     history.pushState {id: length}, null, path
 
@@ -64,17 +67,26 @@ type.defineMethods
 # Internal
 #
 
-type.defineValues ->
+type.defineValues
 
-  _path: location.pathname
+  _path: null
 
-  _length: @_loadLength()
+  _parts: null
+
+  _length: null
 
 type.initInstance ->
+  @_length = @_loadLength()
+  @_setPath location.pathname
   window.addEventListener "popstate", @_stateChanged.bind this
   return
 
 type.defineMethods
+
+  _setPath: (path) ->
+    @_path = path
+    @_parts = path.slice(1).split "/"
+    return
 
   _loadLength: ->
     if length = sessionStorage.getItem "history.length"
@@ -90,7 +102,7 @@ type.defineMethods
 
     path = location.pathname
     return if path is @_path
-    @_path = path
+    @_setPath path
 
     if state is null
       @_updateLength 0
