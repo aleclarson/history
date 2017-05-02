@@ -1,4 +1,5 @@
 
+isDev = require "isDev"
 Event = require "eve"
 Type = require "Type"
 
@@ -12,14 +13,6 @@ type.defineValues ->
 
   didPop: Event()
 
-  _path: location.pathname
-
-  _length: @_loadLength()
-
-type.initInstance ->
-  window.addEventListener "popstate", @_stateChanged.bind this
-  return
-
 type.definePrototype
 
   path:
@@ -29,12 +22,15 @@ type.definePrototype
       unless path.startsWith "/"
         path = "/" + path
 
-      if path is @_path
+      if isDev and path is @_path
         throw Error "Cannot set 'path' to its current value!"
 
-      @_path = path
+      @_setPath path
       history.replaceState {id: @_length}, null, path
       return
+
+  parts:
+    get: -> @_parts
 
   length:
     get: -> @_length
@@ -52,10 +48,10 @@ type.defineMethods
     unless path.startsWith "/"
       path = "/" + path
 
-    if path is @_path
+    if isDev and path is @_path
       throw Error "Cannot call 'push' with the current path!"
 
-    @_path = path
+    @_setPath path
     @_updateLength length = @_length + 1
     history.pushState {id: length}, null, path
 
@@ -65,6 +61,31 @@ type.defineMethods
   pop: ->
     if @_length > 0
       history.back()
+    return
+
+#
+# Internal
+#
+
+type.defineValues
+
+  _path: null
+
+  _parts: null
+
+  _length: null
+
+type.initInstance ->
+  @_length = @_loadLength()
+  @_setPath location.pathname
+  window.addEventListener "popstate", @_stateChanged.bind this
+  return
+
+type.defineMethods
+
+  _setPath: (path) ->
+    @_path = path
+    @_parts = path.slice(1).split "/"
     return
 
   _loadLength: ->
@@ -81,7 +102,7 @@ type.defineMethods
 
     path = location.pathname
     return if path is @_path
-    @_path = path
+    @_setPath path
 
     if state is null
       @_updateLength 0

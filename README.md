@@ -1,5 +1,5 @@
 
-# history v1.0.0
+# history v1.0.1
 
 Simple browser history management.
 
